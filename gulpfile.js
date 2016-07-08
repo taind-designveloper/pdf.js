@@ -17,6 +17,7 @@
 
 'use strict';
 
+var cheerio = require('cheerio');
 var fs = require('fs');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
@@ -327,6 +328,20 @@ function createTestSource(testsName) {
   };
   return source;
 }
+
+gulp.task('lumin', ['publish'], function() {
+  let content = fs.readFileSync('build/generic/web/viewer.html', 'utf8');
+  var $ = cheerio.load(content);
+  var outerContainer = $.html('#outerContainer');
+  var printContainer = $.html('#printContainer');
+  var mozPrint = $.html('#mozPrintCallback-shim'); 
+  var template = '<template name="pdfjs">' 
+    + outerContainer 
+    + printContainer 
+    + mozPrint 
+    + '</template>';
+  fs.writeFile('build/generic/web/viewer.merged.html', template);
+});
 
 gulp.task('default', function() {
   console.log('Available tasks:');
